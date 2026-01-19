@@ -7,6 +7,7 @@ import { curveNatural } from "@visx/curve";
 import { scaleTime, scaleLinear } from "@visx/scale";
 import { ParentSize } from "@visx/responsive";
 import { localPoint } from "@visx/event";
+import { useSpring, motion } from "motion/react";
 // @ts-expect-error - d3-array types not installed
 import { bisector } from "d3-array";
 import {
@@ -261,6 +262,26 @@ function Chart({
     pathLengths.pageviews
   );
 
+  // Spring-animated dash offsets - softer spring so it "catches up" to crosshair
+  const dashSpringConfig = { stiffness: 180, damping: 28 };
+  const usersOffsetSpring = useSpring(
+    usersDashProps.strokeDashoffset,
+    dashSpringConfig
+  );
+  const pageviewsOffsetSpring = useSpring(
+    pageviewsDashProps.strokeDashoffset,
+    dashSpringConfig
+  );
+
+  // Update spring targets when dash props change
+  useEffect(() => {
+    usersOffsetSpring.set(usersDashProps.strokeDashoffset);
+  }, [usersDashProps.strokeDashoffset, usersOffsetSpring]);
+
+  useEffect(() => {
+    pageviewsOffsetSpring.set(pageviewsDashProps.strokeDashoffset);
+  }, [pageviewsDashProps.strokeDashoffset, pageviewsOffsetSpring]);
+
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<SVGRectElement>) => {
       const point = localPoint(event);
@@ -503,32 +524,28 @@ function Chart({
             fadeEdges
           />
 
-          {/* Highlighted segment using stroke-dasharray - only after animation completes */}
+          {/* Highlighted segment using stroke-dasharray with spring animation */}
           {canInteract && isHovering && (
             <>
-              <LinePath
-                data={data}
-                x={(d) => xScale(getDate(d)) ?? 0}
-                y={(d) => yScalePageviews(d.pageviews) ?? 0}
+              {/* Pageviews highlight - use motion.path for spring animation */}
+              <motion.path
+                d={pageviewsPathRef.current?.getAttribute("d") || ""}
                 stroke={cssVars.lineSecondary}
                 strokeWidth={2.5}
                 strokeLinecap="round"
-                curve={curveNatural}
+                fill="none"
                 strokeDasharray={pageviewsDashProps.strokeDasharray}
-                strokeDashoffset={pageviewsDashProps.strokeDashoffset}
-                style={{ transition: "stroke-dashoffset 0.1s ease-out" }}
+                style={{ strokeDashoffset: pageviewsOffsetSpring }}
               />
-              <LinePath
-                data={data}
-                x={(d) => xScale(getDate(d)) ?? 0}
-                y={(d) => yScaleUsers(d.uniqueUsers) ?? 0}
+              {/* Users highlight - use motion.path for spring animation */}
+              <motion.path
+                d={usersPathRef.current?.getAttribute("d") || ""}
                 stroke={cssVars.linePrimary}
                 strokeWidth={2.5}
                 strokeLinecap="round"
-                curve={curveNatural}
+                fill="none"
                 strokeDasharray={usersDashProps.strokeDasharray}
-                strokeDashoffset={usersDashProps.strokeDashoffset}
-                style={{ transition: "stroke-dashoffset 0.1s ease-out" }}
+                style={{ strokeDashoffset: usersOffsetSpring }}
               />
             </>
           )}
