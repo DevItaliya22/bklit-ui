@@ -55,7 +55,25 @@ export interface MarkerGroupProps {
   marginLeft?: number;
   /** Margin top offset from chart container */
   marginTop?: number;
+  /** Delay before entrance animation starts (for staggering) */
+  animationDelay?: number;
+  /** Whether the marker should animate in */
+  animate?: boolean;
 }
+
+// Entrance animation variants
+const markerEntranceVariants = {
+  hidden: {
+    scale: 0.85,
+    opacity: 0,
+    filter: "blur(2px)",
+  },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    filter: "blur(0px)",
+  },
+};
 
 export function MarkerGroup({
   x,
@@ -67,6 +85,8 @@ export function MarkerGroup({
   containerRef,
   marginLeft = 0,
   marginTop = 0,
+  animationDelay = 0,
+  animate = true,
 }: MarkerGroupProps) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldFan = isHovered && markers.length > 1;
@@ -101,58 +121,71 @@ export function MarkerGroup({
 
   return (
     <>
-      {/* SVG anchor point - the main marker circle */}
+      {/* SVG anchor point - positioned group */}
       <g
         transform={`translate(${x}, ${y})`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{ cursor: "pointer" }}
       >
-        {/* Invisible hit area for easier hovering */}
-        <rect
-          x={-size}
-          y={-size * 2.5}
-          width={size * 2}
-          height={size * 3}
-          fill="transparent"
-        />
+        {/* Animated wrapper for entrance effect */}
+        <motion.g
+          initial={animate ? "hidden" : "visible"}
+          animate="visible"
+          variants={markerEntranceVariants}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 25,
+            delay: animationDelay,
+          }}
+        >
+          {/* Invisible hit area for easier hovering */}
+          <rect
+            x={-size}
+            y={-size * 2.5}
+            width={size * 2}
+            height={size * 3}
+            fill="transparent"
+          />
 
-        {/* Main stacked marker (always visible) */}
-        <MarkerCircle
-          icon={markers[0]?.icon}
-          size={size}
-          color={markers[0]?.color}
-        />
+          {/* Main stacked marker (always visible) */}
+          <MarkerCircle
+            icon={markers[0]?.icon}
+            size={size}
+            color={markers[0]?.color}
+          />
 
-        {/* Stack count badge when multiple */}
-        <AnimatePresence>
-          {hasMultiple && !shouldFan && (
-            <motion.g
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            >
-              <circle
-                cx={size / 2 + 2}
-                cy={-size / 2 - 2}
-                r={9}
-                fill="var(--chart-line-primary)"
-              />
-              <text
-                x={size / 2 + 2}
-                y={-size / 2 - 2}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize={11}
-                fontWeight={600}
-                fill="white"
+          {/* Stack count badge when multiple */}
+          <AnimatePresence>
+            {hasMultiple && !shouldFan && (
+              <motion.g
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                {markers.length}
-              </text>
-            </motion.g>
-          )}
-        </AnimatePresence>
+                <circle
+                  cx={size / 2 + 2}
+                  cy={-size / 2 - 2}
+                  r={9}
+                  fill="var(--chart-line-primary)"
+                />
+                <text
+                  x={size / 2 + 2}
+                  y={-size / 2 - 2}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize={11}
+                  fontWeight={600}
+                  fill="white"
+                >
+                  {markers.length}
+                </text>
+              </motion.g>
+            )}
+          </AnimatePresence>
+        </motion.g>
       </g>
 
       {/* Portal for fanned circles - escapes SVG clipping */}

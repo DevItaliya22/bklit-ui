@@ -549,28 +549,36 @@ function Chart({
           />
 
           {/* Markers at top of chart */}
-          {Array.from(markersByDate.entries()).map(([dateKey, dateMarkers]) => {
-            // Find the x position for this date
-            const markerDate = dateMarkers[0]?.date;
-            if (!markerDate) return null;
-            const markerX = xScale(markerDate) ?? 0;
-            // Check if this date is currently hovered
-            const isActive = tooltipData?.point.date.toDateString() === dateKey;
+          {Array.from(markersByDate.entries()).map(
+            ([dateKey, dateMarkers], groupIndex) => {
+              // Find the x position for this date
+              const markerDate = dateMarkers[0]?.date;
+              if (!markerDate) return null;
+              const markerX = xScale(markerDate) ?? 0;
+              // Check if this date is currently hovered
+              const isActive =
+                tooltipData?.point.date.toDateString() === dateKey;
 
-            return (
-              <MarkerGroup
-                key={dateKey}
-                x={markerX}
-                y={-8} // Position above chart area
-                markers={dateMarkers}
-                isActive={isActive}
-                size={28}
-                containerRef={containerRef}
-                marginLeft={margin.left}
-                marginTop={margin.top}
-              />
-            );
-          })}
+              // Stagger animation: start after chart loads + 100ms per marker group
+              const markerDelay = animationDuration / 1000 + groupIndex * 0.1;
+
+              return (
+                <MarkerGroup
+                  key={dateKey}
+                  x={markerX}
+                  y={-8} // Position above chart area
+                  markers={dateMarkers}
+                  isActive={isActive}
+                  size={28}
+                  containerRef={containerRef}
+                  marginLeft={margin.left}
+                  marginTop={margin.top}
+                  animate={true}
+                  animationDelay={markerDelay}
+                />
+              );
+            }
+          )}
 
           {/* Invisible overlay for mouse events - only active after animation completes */}
           <rect
