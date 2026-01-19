@@ -575,6 +575,8 @@ function Chart({
                   marginTop={margin.top}
                   animate={true}
                   animationDelay={markerDelay}
+                  lineHeight={innerHeight}
+                  showLine={true}
                 />
               );
             }

@@ -59,6 +59,10 @@ export interface MarkerGroupProps {
   animationDelay?: number;
   /** Whether the marker should animate in */
   animate?: boolean;
+  /** Height of the vertical guide line below the marker */
+  lineHeight?: number;
+  /** Whether to show the vertical guide line. Default: true */
+  showLine?: boolean;
 }
 
 // Entrance animation variants
@@ -87,6 +91,8 @@ export function MarkerGroup({
   marginTop = 0,
   animationDelay = 0,
   animate = true,
+  lineHeight = 0,
+  showLine = true,
 }: MarkerGroupProps) {
   const [isHovered, setIsHovered] = useState(false);
   const shouldFan = isHovered && markers.length > 1;
@@ -148,6 +154,28 @@ export function MarkerGroup({
             height={size * 3}
             fill="transparent"
           />
+
+          {/* Vertical dashed guide line - responds to hover states */}
+          {showLine && lineHeight > 0 && (
+            <motion.line
+              x1={0}
+              y1={size / 2 + 4}
+              x2={0}
+              y2={lineHeight + Math.abs(y)}
+              stroke={cssVars.markerBorder}
+              strokeWidth={1}
+              strokeDasharray="4,4"
+              strokeLinecap="round"
+              animate={{ 
+                // Marker hover: 100%, Day hover (crosshair): 0%, Default: 60%
+                strokeOpacity: isHovered ? 1 : isActive ? 0 : 0.6 
+              }}
+              transition={{ 
+                duration: 0.2,
+                ease: "easeOut"
+              }}
+            />
+          )}
 
           {/* Main stacked marker (always visible) */}
           <MarkerCircle
