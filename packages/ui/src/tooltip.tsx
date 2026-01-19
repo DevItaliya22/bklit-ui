@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
-import { motion, useSpring, useTransform } from "motion/react";
+import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
+import { motion, useSpring } from "motion/react";
 
-// Spring config for smooth tooltip movement
-const springConfig = { stiffness: 400, damping: 35 };
+// Spring config for smooth tooltip movement - matches dash array for consistency
+const springConfig = { stiffness: 100, damping: 20 };
+
+// Faster spring for crosshair/indicator - more responsive to mouse movement
+const crosshairSpringConfig = { stiffness: 300, damping: 30 };
 
 export interface TooltipRow {
   color: string;
@@ -99,48 +102,87 @@ export function ChartTooltip({
   className = "",
   markerContent,
 }: TooltipProps) {
-  // Animated X position
-  const animatedX = useSpring(x, springConfig);
+  // Ref to measure actual tooltip width
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [tooltipWidth, setTooltipWidth] = useState(180); // Default estimate
+
+  // Measure tooltip width after render - runs on every render to catch content changes
+  useLayoutEffect(() => {
+    if (tooltipRef.current) {
+      const width = tooltipRef.current.offsetWidth;
+      if (width > 0 && width !== tooltipWidth) {
+        setTooltipWidth(width);
+      }
+    }
+  }, [visible, rows, markerContent, tooltipWidth]);
+
+  // Tooltip positioning constants
+  const tooltipOffset = 16;
+
+  // Calculate target position - this is the actual left position in pixels
+  // When flipped, we need to position the tooltip so its RIGHT edge is offset from crosshair
+  const shouldFlip = x + tooltipWidth + tooltipOffset > containerWidth;
+  const targetX = shouldFlip
+    ? x - tooltipOffset - tooltipWidth // Position left of crosshair
+    : x + tooltipOffset; // Position right of crosshair
+
+  // Track flip state changes for animation
+  const prevFlipRef = useRef(shouldFlip);
+  const [flipKey, setFlipKey] = useState(0);
+
+  useEffect(() => {
+    if (prevFlipRef.current !== shouldFlip) {
+      setFlipKey((k) => k + 1); // Trigger re-animation on flip
+      prevFlipRef.current = shouldFlip;
+    }
+  }, [shouldFlip]);
+
+  // Animated position - smoothly moves when flip happens
+  const animatedLeft = useSpring(targetX, springConfig);
 
   // Update spring target when position changes
+  React.useEffect(() => {
+    animatedLeft.set(targetX);
+  }, [targetX, animatedLeft]);
+
+  // Also animate the crosshair position for the date ticker - uses faster spring to stay in sync
+  const animatedX = useSpring(x, crosshairSpringConfig);
   React.useEffect(() => {
     animatedX.set(x);
   }, [x, animatedX]);
 
-  // Tooltip box position - flip to left side when near right edge
-  // Use consistent offset (16px) on both sides
-  const tooltipOffset = 16;
-  const tooltipWidth = 180; // Estimated max width for collision detection
-  const shouldFlip = x + tooltipWidth + tooltipOffset > containerWidth;
-
-  const tooltipLeft = useTransform(animatedX, (val) => {
-    // Right side: offset from crosshair
-    // Left side: position so right edge is offset from crosshair
-    return shouldFlip ? val - tooltipOffset : val + tooltipOffset;
-  });
-
-  // Transform origin for flip animation
-  const transformOrigin = shouldFlip ? "right top" : "left top";
-
   if (!visible) return null;
+
+  // Transform origin based on flip - animate from the edge closest to crosshair
+  const transformOrigin = shouldFlip ? "right top" : "left top";
 
   return (
     <>
       {/* Tooltip Box */}
       <motion.div
+        ref={tooltipRef}
         className={`absolute pointer-events-none z-50 top-10 ${className}`}
         style={{
-          left: tooltipLeft,
-          // When flipped, translate left by 100% to align right edge with position
-          x: shouldFlip ? "-100%" : 0,
-          transformOrigin,
+          left: animatedLeft,
         }}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.15 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.1 }}
       >
-        <div className="bg-zinc-900/30 backdrop-blur-md text-white rounded-lg shadow-lg px-3 py-2.5 min-w-[140px]">
+        {/* Inner content with flip animation */}
+        <motion.div
+          key={flipKey}
+          className="bg-zinc-900/30 backdrop-blur-md text-white rounded-lg shadow-lg px-3 py-2.5 min-w-[140px]"
+          initial={{ scale: 0.85, opacity: 0, x: shouldFlip ? 20 : -20 }}
+          animate={{ scale: 1, opacity: 1, x: 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 25,
+          }}
+          style={{ transformOrigin }}
+        >
           {title && (
             <div className="text-xs font-medium text-zinc-400 mb-2">
               {title}
@@ -169,7 +211,7 @@ export function ChartTooltip({
           </div>
           {/* Marker content appended below data rows */}
           {markerContent}
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* Animated Date Ticker at bottom */}
@@ -273,8 +315,8 @@ export function TooltipIndicator({
       ? span * columnWidth
       : resolveWidth(width);
 
-  // Animate X position (left edge of rect, centered on x)
-  const animatedX = useSpring(x - pixelWidth / 2, springConfig);
+  // Animate X position (left edge of rect, centered on x) - uses faster spring
+  const animatedX = useSpring(x - pixelWidth / 2, crosshairSpringConfig);
 
   React.useEffect(() => {
     animatedX.set(x - pixelWidth / 2);
@@ -334,8 +376,9 @@ export function TooltipDot({
   strokeColor = "white",
   strokeWidth = 2,
 }: TooltipDotProps) {
-  const animatedX = useSpring(x, springConfig);
-  const animatedY = useSpring(y, springConfig);
+  // Use faster crosshair spring to stay in sync with indicator
+  const animatedX = useSpring(x, crosshairSpringConfig);
+  const animatedY = useSpring(y, crosshairSpringConfig);
 
   React.useEffect(() => {
     animatedX.set(x);
