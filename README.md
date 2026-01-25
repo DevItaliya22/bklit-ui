@@ -1,6 +1,22 @@
-# Bklit UI
+![hero](https://github.com/bklit/bklit-ui/blob/main/apps/web/app/og-image.png?raw=true)
 
-A collection of beautiful, animated React components built with TypeScript and Tailwind CSS.
+<p align="center">
+	<h1 align="center"><b>Bklit UI</b></h1>
+<p align="center">
+    A collection of Open Source charts and utility components that you can customize and extend.
+    <br />
+    <br />
+    <a href="https://ui.bklit.com">Docs</a>
+    ·
+    <a href="https://x.com/bklitai">X.com</a>
+    ·
+    <a href="https://discord.gg/9yyK8FwPcU">Discord</a>
+    ·
+    <a href="https://github.com/bklit/bklit-ui/issues">Issues</a>
+  </p>
+</p>
+
+### [→ Demo](https://ui.bklit.com)
 
 ## Getting Started
 
