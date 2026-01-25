@@ -23,7 +23,7 @@ export function DocsLayout({ children, tree, nav }: DocsLayoutProps) {
     <div className="min-h-screen">
       <SiteHeader githubUrl={nav?.githubUrl} links={nav?.links} />
       <div className="mx-auto max-w-7xl pt-14">
-        <Sidebar tree={tree} />
+        <Sidebar links={nav?.links} tree={tree} />
         <main className="lg:ml-64 xl:mr-56">{children}</main>
       </div>
     </div>

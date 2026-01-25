@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "fumadocs-core/link";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { GithubStarCount } from "../github-star-count";
@@ -58,6 +59,7 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export function SiteHeader({ links = [], githubUrl }: SiteHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -80,7 +82,10 @@ export function SiteHeader({ links = [], githubUrl }: SiteHeaderProps) {
               className="font-semibold text-foreground text-lg no-underline transition-opacity hover:opacity-80"
               href="/"
             >
-              <BklitLogo size={24} />
+              <BklitLogo
+                size={24}
+                theme={resolvedTheme === "dark" ? "dark" : "light"}
+              />
             </Link>
 
             {/* Desktop nav */}
