@@ -7,7 +7,7 @@ export const radarCssVars = {
   background: "var(--chart-background)",
   foreground: "var(--chart-foreground)",
   foregroundMuted: "var(--chart-foreground-muted)",
-  label: "var(--chart-label)",
+  label: "var(--chart-label, oklch(0.65 0.01 260))",
   grid: "var(--chart-grid)",
   border: "var(--border)",
   // Default radar colors from chart palette

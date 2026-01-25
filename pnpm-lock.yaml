@@ -38,6 +38,30 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.2)(react@19.2.0)
+      '@visx/curve':
+        specifier: 3.12.0
+        version: 3.12.0
+      '@visx/event':
+        specifier: 3.12.0
+        version: 3.12.0
+      '@visx/gradient':
+        specifier: 3.12.0
+        version: 3.12.0(react@19.2.0)
+      '@visx/grid':
+        specifier: 3.12.0
+        version: 3.12.0(react@19.2.0)
+      '@visx/group':
+        specifier: 3.12.0
+        version: 3.12.0(react@19.2.0)
+      '@visx/responsive':
+        specifier: 3.12.0
+        version: 3.12.0(react@19.2.0)
+      '@visx/scale':
+        specifier: 3.12.0
+        version: 3.12.0
+      '@visx/shape':
+        specifier: 3.12.0
+        version: 3.12.0(react@19.2.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

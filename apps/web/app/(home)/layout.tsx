@@ -1,7 +1,25 @@
-import { HomeLayout } from "fumadocs-ui/layouts/home";
 import type { ReactNode } from "react";
-import { baseOptions } from "../layout.config";
+import { SiteHeader } from "@/components/docs/site-header";
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <HomeLayout {...baseOptions}>{children}</HomeLayout>;
+  return (
+    <div className="min-h-screen">
+      <SiteHeader
+        githubUrl="https://github.com/bklit/bklit-ui"
+        links={[
+          {
+            text: "Docs",
+            url: "/docs",
+            active: "nested-url",
+          },
+          {
+            text: "Components",
+            url: "/docs/components",
+            active: "nested-url",
+          },
+        ]}
+      />
+      <div className="pt-14">{children}</div>
+    </div>
+  );
 }
