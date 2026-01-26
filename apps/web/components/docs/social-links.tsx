@@ -7,7 +7,7 @@ export function SocialLinks() {
     <div className="not-prose grid grid-cols-2 gap-4">
       <Link
         className="flex w-full flex-col items-center rounded-xl bg-accent/60 p-6 transition-colors hover:bg-accent sm:p-10"
-        href="https://x.com/bklit"
+        href="https://x.com/bklitai"
         rel="noreferrer"
         target="_blank"
       >
