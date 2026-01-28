@@ -38,29 +38,20 @@ function getNodeObject(
   return nodeOrIndex;
 }
 
-// Default node color palette
-const sourceColors = [
-  "#6366f1",
-  "#8b5cf6",
-  "#a855f7",
-  "#c084fc",
-  "#818cf8",
-  "#7c3aed",
+// Default node color palette using CSS variables
+const defaultColors = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
 ];
-const landingColors = ["#06b6d4", "#14b8a6", "#22c55e", "#10b981", "#0ea5e9"];
-const outcomeColors = ["#22c55e", "#eab308", "#ef4444"];
 
 function getDefaultNodeColor(
   node: SankeyNodeType<SankeyNodeDatum, SankeyLinkDatum>
 ): string {
   const index = node.index ?? 0;
-  if (node.category === "source") {
-    return sourceColors[index % sourceColors.length] ?? "#6366f1";
-  }
-  if (node.category === "landing") {
-    return landingColors[(index - 6) % landingColors.length] ?? "#06b6d4";
-  }
-  return outcomeColors[(index - 11) % outcomeColors.length] ?? "#22c55e";
+  return defaultColors[index % defaultColors.length] ?? "var(--chart-1)";
 }
 
 export interface SankeyLinkProps {
@@ -240,7 +231,7 @@ export function SankeyLink({
       if (getLinkColor) {
         return getLinkColor(link, index);
       }
-      return stroke || "oklch(0.55 0.014 260)";
+      return stroke || "var(--chart-line-primary)";
     },
     [getLinkColor, stroke]
   );
@@ -260,8 +251,12 @@ export function SankeyLink({
 
       // Always define a gradient so `url(#...)` never points to a missing id.
       // Use fallback colors if nodes can't be resolved
-      const sourceColor = sourceNode ? getNodeColorFn(sourceNode) : "#64748b";
-      const targetColor = targetNode ? getNodeColorFn(targetNode) : "#64748b";
+      const sourceColor = sourceNode
+        ? getNodeColorFn(sourceNode)
+        : "var(--chart-1)";
+      const targetColor = targetNode
+        ? getNodeColorFn(targetNode)
+        : "var(--chart-1)";
       const gradientId = `link-gradient-${index}`;
 
       // Get absolute x positions for gradient

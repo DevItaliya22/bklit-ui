@@ -254,15 +254,17 @@ export function SankeyNode({
     animationDuration,
   } = useSankey();
 
-  const sourceColors = useMemo(
-    () => ["#6366f1", "#8b5cf6", "#a855f7", "#c084fc", "#818cf8", "#7c3aed"],
+  // Default colors using CSS variables
+  const defaultColors = useMemo(
+    () => [
+      "var(--chart-1)",
+      "var(--chart-2)",
+      "var(--chart-3)",
+      "var(--chart-4)",
+      "var(--chart-5)",
+    ],
     []
   );
-  const landingColors = useMemo(
-    () => ["#06b6d4", "#14b8a6", "#22c55e", "#10b981", "#0ea5e9"],
-    []
-  );
-  const outcomeColors = useMemo(() => ["#22c55e", "#eab308", "#ef4444"], []);
 
   // Get color for a node
   const getColor = useCallback(
@@ -277,28 +279,9 @@ export function SankeyNode({
         return getNodeColorProp(node, index);
       }
 
-      const category = node.category;
-      if (category === "source") {
-        return (
-          sourceColors[index % sourceColors.length] ??
-          sourceColors[0] ??
-          "#6366f1"
-        );
-      }
-      if (category === "landing") {
-        return (
-          landingColors[(index - 6) % landingColors.length] ??
-          landingColors[0] ??
-          "#06b6d4"
-        );
-      }
-      return (
-        outcomeColors[(index - 11) % outcomeColors.length] ??
-        outcomeColors[0] ??
-        "#22c55e"
-      );
+      return defaultColors[index % defaultColors.length] ?? "var(--chart-1)";
     },
-    [fill, getNodeColorProp, sourceColors, landingColors, outcomeColors]
+    [fill, getNodeColorProp, defaultColors]
   );
 
   // Check if a node is connected to the hovered element
