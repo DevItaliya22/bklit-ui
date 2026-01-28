@@ -21,6 +21,9 @@ import {
   RingCenter,
   RingChart,
   type RingData,
+  SankeyChart,
+  SankeyLink,
+  SankeyNode,
 } from "@bklitui/ui/charts";
 import { XAxis } from "@bklitui/ui/charts/x-axis";
 import { curveStep } from "@visx/curve";
@@ -125,9 +128,50 @@ const barDataMultiSeries = [
   { month: "Jun", revenue: 21_200, expenses: 11_800, profit: 9400 },
 ];
 
+// Simple sankey data
+const sankeyData = {
+  nodes: [
+    { name: "A", category: "source" as const },
+    { name: "B", category: "source" as const },
+    { name: "C", category: "source" as const },
+    { name: "X", category: "landing" as const },
+    { name: "Y", category: "landing" as const },
+    { name: "Z", category: "outcome" as const },
+  ],
+  links: [
+    { source: 0, target: 3, value: 40 },
+    { source: 0, target: 4, value: 20 },
+    { source: 1, target: 3, value: 30 },
+    { source: 1, target: 4, value: 35 },
+    { source: 2, target: 4, value: 25 },
+    { source: 3, target: 5, value: 70 },
+    { source: 4, target: 5, value: 80 },
+  ],
+};
+
 export function HomeComponents() {
   return (
     <>
+      {/* Sankey */}
+      <ShowcaseCard className="col-span-7 flex-1">
+        <div className="h-full w-full">
+          <LineChart data={lineData}>
+            <ChartTooltip />
+            <Grid horizontal />
+            <Line dataKey="users" strokeWidth={2} />
+          </LineChart>
+        </div>
+      </ShowcaseCard>
+
+      <ShowcaseCard className="col-span-5 flex-1 flex-col gap-1">
+        <span className="font-medium text-muted-foreground text-sm">
+          Pie Chart
+        </span>
+        <span className="font-light text-muted-foreground/80 text-xs tracking-wide">
+          Coming soon
+        </span>
+      </ShowcaseCard>
+
       {/* Row 1: Two bar charts side by side */}
       <ShowcaseCard className="col-span-full min-h-[200px] sm:col-span-6">
         <div className="h-full w-full">
@@ -175,14 +219,17 @@ export function HomeComponents() {
         <div className="flex flex-1 flex-col gap-4 sm:basis-7/12">
           <ShowcaseCard className="min-h-[200px] flex-1">
             <div className="h-full w-full">
-              <LineChart data={lineData}>
-                <ChartTooltip />
-                <Grid horizontal />
-                <Line dataKey="users" strokeWidth={2} />
-              </LineChart>
+              <SankeyChart
+                data={sankeyData}
+                margin={{ top: 16, right: 16, bottom: 16, left: 16 }}
+                nodePadding={20}
+                nodeWidth={12}
+              >
+                <SankeyLink strokeOpacity={0.4} />
+                <SankeyNode lineCap={3} showLabels={false} />
+              </SankeyChart>
             </div>
           </ShowcaseCard>
-
           <ShowcaseCard className="min-h-[200px] flex-1">
             <div className="h-full w-full">
               <AreaChart data={areaData}>
