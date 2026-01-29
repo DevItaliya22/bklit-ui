@@ -1,5 +1,6 @@
 import { GithubStatsProvider } from "@/components/providers/github-stats-provider";
 import "./globals.css";
+import { BklitComponent } from "@bklit/sdk/nextjs";
 import { RootProvider } from "fumadocs-ui/provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -31,6 +32,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col">
+        <BklitComponent
+          apiKey={process.env.BKLIT_API_KEY ?? ""}
+          projectId={process.env.BKLIT_PROJECT_ID ?? ""}
+        />
         <GithubStatsProvider>
           <RootProvider
             theme={{
