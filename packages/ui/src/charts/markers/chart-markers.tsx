@@ -31,7 +31,7 @@ export function MarkerTooltipContent({ markers }: MarkerTooltipContentProps) {
   const hiddenCount = markers.length - MAX_TOOLTIP_MARKERS;
 
   return (
-    <div className="mt-2 space-y-2 border-zinc-700/50 border-t pt-2">
+    <div className="mt-2 space-y-2 border-chart-tooltip-muted border-t pt-2">
       {visibleMarkers.map((marker, index) => {
         const isClickable = !!(marker.onClick || marker.href);
         return (
@@ -40,7 +40,7 @@ export function MarkerTooltipContent({ markers }: MarkerTooltipContentProps) {
             key={`${marker.title}-${index}`}
           >
             <div
-              className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
               style={{
                 backgroundColor: marker.color || chartCssVars.markerBackground,
                 border: `1px solid ${chartCssVars.markerBorder}`,
@@ -58,14 +58,16 @@ export function MarkerTooltipContent({ markers }: MarkerTooltipContentProps) {
                 marker.content
               ) : (
                 <>
-                  <div className="flex items-center gap-1.5 truncate font-medium text-sm text-white">
+                  <div className="flex items-center gap-1.5 truncate font-medium text-chart-tooltip-foreground text-sm">
                     {marker.title}
                     {isClickable && (
-                      <span className="text-[10px] text-zinc-500">↗</span>
+                      <span className="text-[10px] text-chart-tooltip-muted">
+                        ↗
+                      </span>
                     )}
                   </div>
                   {marker.description && (
-                    <div className="truncate text-xs text-zinc-400">
+                    <div className="truncate text-chart-tooltip-muted text-xs">
                       {marker.description}
                     </div>
                   )}
@@ -76,7 +78,9 @@ export function MarkerTooltipContent({ markers }: MarkerTooltipContentProps) {
         );
       })}
       {hiddenCount > 0 && (
-        <div className="pl-7 text-xs text-zinc-500">+{hiddenCount} more...</div>
+        <div className="pl-7 text-chart-tooltip-muted text-xs">
+          +{hiddenCount} more...
+        </div>
       )}
     </div>
   );

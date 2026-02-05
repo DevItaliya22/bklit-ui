@@ -204,12 +204,12 @@ export function MarkerGroup({
                   <circle
                     cx={size / 2 + 2}
                     cy={-size / 2 - 2}
-                    fill="var(--chart-line-primary)"
+                    fill={chartCssVars.badgeBackground}
                     r={9}
                   />
                   <text
                     dominantBaseline="central"
-                    fill="white"
+                    fill={chartCssVars.badgeForeground}
                     fontSize={11}
                     fontWeight={600}
                     textAnchor="middle"
