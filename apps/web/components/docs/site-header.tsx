@@ -37,6 +37,8 @@ const utilities = [
   { text: "Legend", url: "/docs/utility/legend" },
   { text: "Grid", url: "/docs/utility/grid" },
   { text: "Tooltip", url: "/docs/utility/tooltip" },
+  { text: "Custom Indicator", url: "/docs/utility/custom-indicator" },
+  { text: "useChart", url: "/docs/utility/use-chart" },
 ];
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -70,6 +72,186 @@ function MenuIcon({ open }: { open: boolean }) {
 
 const STAGGER_DURATION = 650; // Total duration for all staggered items (ms)
 
+interface MobileMenuProps {
+  links: NavLink[];
+  githubUrl?: string;
+  discordUrl?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  staggerDelay: number;
+}
+
+function MobileMenu({
+  links,
+  githubUrl,
+  discordUrl,
+  isOpen,
+  onClose,
+  staggerDelay,
+}: MobileMenuProps) {
+  const getBlurStyle = (index: number) => ({
+    filter: isOpen ? "blur(0px)" : "blur(2px)",
+    transitionDelay: isOpen ? `${index * staggerDelay}ms` : "0ms",
+  });
+
+  const componentsStartIndex = links.length + 1;
+  const utilitiesStartIndex = componentsStartIndex + components.length + 1;
+  const externalLinksStartIndex = utilitiesStartIndex + utilities.length;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+          isOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        }`}
+        onClick={onClose}
+      />
+
+      {/* Sheet */}
+      <div
+        className={`fixed top-14 right-0 left-0 z-50 max-h-[calc(100vh-3.5rem)] overflow-y-auto overscroll-contain border-border border-b bg-background/95 backdrop-blur-xl transition-all duration-300 ease-out md:hidden ${
+          isOpen
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-4 opacity-0"
+        }`}
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
+      >
+        <nav className="flex flex-col px-6 py-4 pb-8">
+          {/* Main links */}
+          <div className="flex flex-col gap-1">
+            {links.map((link, index) => (
+              <Link
+                className="transition-[filter] duration-300 ease-out"
+                href={link.url}
+                key={link.url}
+                onClick={onClose}
+                style={getBlurStyle(index)}
+              >
+                <Button
+                  className="w-full justify-start"
+                  size="sm"
+                  variant="ghost"
+                >
+                  {link.text}
+                </Button>
+              </Link>
+            ))}
+          </div>
+
+          {/* Components section */}
+          <div className="mt-4 border-border border-t pt-4">
+            <span
+              className="mb-2 block px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider transition-[filter] duration-300 ease-out"
+              style={getBlurStyle(links.length)}
+            >
+              Components
+            </span>
+            <div className="flex flex-col gap-1">
+              {components.map((component, index) => (
+                <Link
+                  className="transition-[filter] duration-300 ease-out"
+                  href={component.url}
+                  key={component.url}
+                  onClick={onClose}
+                  style={getBlurStyle(componentsStartIndex + index)}
+                >
+                  <Button
+                    className="w-full justify-start"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    {component.text}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Utility section */}
+          <div className="mt-4 border-border border-t pt-4">
+            <span
+              className="mb-2 block px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider transition-[filter] duration-300 ease-out"
+              style={getBlurStyle(utilitiesStartIndex - 1)}
+            >
+              Utility
+            </span>
+            <div className="flex flex-col gap-1">
+              {utilities.map((utility, index) => (
+                <Link
+                  className="transition-[filter] duration-300 ease-out"
+                  href={utility.url}
+                  key={utility.url}
+                  onClick={onClose}
+                  style={getBlurStyle(utilitiesStartIndex + index)}
+                >
+                  <Button
+                    className="w-full justify-start"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    {utility.text}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* External links */}
+          {(githubUrl || discordUrl) && (
+            <div className="mt-4 flex flex-col gap-1 border-border border-t pt-4">
+              {githubUrl && (
+                <Link
+                  aria-label="GitHub"
+                  className="transition-[filter] duration-300 ease-out"
+                  external
+                  href={githubUrl}
+                  onClick={onClose}
+                  style={getBlurStyle(externalLinksStartIndex)}
+                >
+                  <Button
+                    className="w-full justify-start gap-2 font-light font-mono text-muted-foreground text-xs"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <GitHubIcon />
+                    <span>GitHub</span>
+                    <GithubStarCount />
+                  </Button>
+                </Link>
+              )}
+              {discordUrl && (
+                <Link
+                  aria-label="Discord"
+                  className="transition-[filter] duration-300 ease-out"
+                  external
+                  href={discordUrl}
+                  onClick={onClose}
+                  style={getBlurStyle(
+                    externalLinksStartIndex + (githubUrl ? 1 : 0)
+                  )}
+                >
+                  <Button
+                    className="w-full justify-start gap-2 text-muted-foreground"
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <DiscordIcon className="size-4" />
+                    <span>Discord</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
+          )}
+        </nav>
+      </div>
+    </>
+  );
+}
+
 export function SiteHeader({
   links = [],
   githubUrl,
@@ -86,7 +268,8 @@ export function SiteHeader({
     components.length +
     1 + // Utilities header
     utilities.length +
-    (githubUrl ? 1 : 0);
+    (githubUrl ? 1 : 0) +
+    (discordUrl ? 1 : 0);
   const staggerDelay = totalItems > 1 ? STAGGER_DURATION / (totalItems - 1) : 0;
 
   // Wait for mount to avoid hydration mismatch with theme
@@ -168,163 +351,14 @@ export function SiteHeader({
         </div>
       </header>
 
-      {/* Mobile menu sheet */}
-      {/* Backdrop */}
-      <div
-        aria-hidden="true"
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
-          mobileMenuOpen
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
-        }`}
-        onClick={() => setMobileMenuOpen(false)}
+      <MobileMenu
+        discordUrl={discordUrl}
+        githubUrl={githubUrl}
+        isOpen={mobileMenuOpen}
+        links={links}
+        onClose={() => setMobileMenuOpen(false)}
+        staggerDelay={staggerDelay}
       />
-
-      {/* Sheet */}
-      <div
-        className={`fixed top-14 right-0 left-0 z-50 max-h-[calc(100vh-3.5rem)] overflow-y-auto overscroll-contain border-border border-b bg-background/95 backdrop-blur-xl transition-all duration-300 ease-out md:hidden ${
-          mobileMenuOpen
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none -translate-y-4 opacity-0"
-        }`}
-        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
-      >
-        <nav className="flex flex-col px-6 py-4 pb-8">
-          {/* Main links */}
-          <div className="flex flex-col gap-1">
-            {links.map((link, index) => (
-              <Link
-                className="transition-[filter] duration-300 ease-out"
-                href={link.url}
-                key={link.url}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  filter: mobileMenuOpen ? "blur(0px)" : "blur(2px)",
-                  transitionDelay: mobileMenuOpen
-                    ? `${index * staggerDelay}ms`
-                    : "0ms",
-                }}
-              >
-                <Button
-                  className="w-full justify-start"
-                  size="sm"
-                  variant="ghost"
-                >
-                  {link.text}
-                </Button>
-              </Link>
-            ))}
-          </div>
-
-          {/* Components section */}
-          <div className="mt-4 border-border border-t pt-4">
-            <span
-              className="mb-2 block px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider transition-[filter] duration-300 ease-out"
-              style={{
-                filter: mobileMenuOpen ? "blur(0px)" : "blur(2px)",
-                transitionDelay: mobileMenuOpen
-                  ? `${links.length * staggerDelay}ms`
-                  : "0ms",
-              }}
-            >
-              Components
-            </span>
-            <div className="flex flex-col gap-1">
-              {components.map((component, index) => (
-                <Link
-                  className="transition-[filter] duration-300 ease-out"
-                  href={component.url}
-                  key={component.url}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    filter: mobileMenuOpen ? "blur(0px)" : "blur(2px)",
-                    transitionDelay: mobileMenuOpen
-                      ? `${(links.length + 1 + index) * staggerDelay}ms`
-                      : "0ms",
-                  }}
-                >
-                  <Button
-                    className="w-full justify-start"
-                    size="sm"
-                    variant="ghost"
-                  >
-                    {component.text}
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Utility section */}
-          <div className="mt-4 border-border border-t pt-4">
-            <span
-              className="mb-2 block px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider transition-[filter] duration-300 ease-out"
-              style={{
-                filter: mobileMenuOpen ? "blur(0px)" : "blur(2px)",
-                transitionDelay: mobileMenuOpen
-                  ? `${(links.length + 1 + components.length) * staggerDelay}ms`
-                  : "0ms",
-              }}
-            >
-              Utility
-            </span>
-            <div className="flex flex-col gap-1">
-              {utilities.map((utility, index) => (
-                <Link
-                  className="transition-[filter] duration-300 ease-out"
-                  href={utility.url}
-                  key={utility.url}
-                  onClick={() => setMobileMenuOpen(false)}
-                  style={{
-                    filter: mobileMenuOpen ? "blur(0px)" : "blur(2px)",
-                    transitionDelay: mobileMenuOpen
-                      ? `${(links.length + 1 + components.length + 1 + index) * staggerDelay}ms`
-                      : "0ms",
-                  }}
-                >
-                  <Button
-                    className="w-full justify-start"
-                    size="sm"
-                    variant="ghost"
-                  >
-                    {utility.text}
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* GitHub link */}
-          {githubUrl && (
-            <div
-              className="mt-4 border-border border-t pt-4 transition-[filter] duration-300 ease-out"
-              style={{
-                filter: mobileMenuOpen ? "blur(0px)" : "blur(2px)",
-                transitionDelay: mobileMenuOpen
-                  ? `${(links.length + 1 + components.length + 1 + utilities.length) * staggerDelay}ms`
-                  : "0ms",
-              }}
-            >
-              <Link
-                aria-label="GitHub"
-                external
-                href={githubUrl}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Button
-                  className="w-full justify-start gap-2 font-light font-mono text-muted-foreground text-xs"
-                  size="sm"
-                  variant="ghost"
-                >
-                  <GitHubIcon />
-                  <span>GitHub</span>
-                  <GithubStarCount />
-                </Button>
-              </Link>
-            </div>
-          )}
-        </nav>
-      </div>
     </>
   );
 }
