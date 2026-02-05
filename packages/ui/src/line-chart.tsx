@@ -10,13 +10,10 @@ import { AnimatePresence, motion, useSpring } from "motion/react";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChartGrid } from "./chart-grid";
-import {
-  type ChartMarker,
-  MarkerGroup,
-  MarkerTooltipContent,
-} from "./chart-marker";
+import { MarkerTooltipContent } from "./charts/markers/chart-markers";
+import { type ChartMarker, MarkerGroup } from "./charts/markers/marker-group";
 
-export type { ChartMarker } from "./chart-marker";
+export type { ChartMarker } from "./charts/markers/marker-group";
 
 import {
   ChartTooltip,
@@ -750,81 +747,8 @@ export default function CurvedLineChart({
   const [chartKey, _setChartKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Demo markers - use prop markers or generate sample ones
-  const markers = useMemo(() => {
-    if (propMarkers) {
-      return propMarkers;
-    }
-    // Generate sample markers for demo
-    const now = new Date();
-    // Helper to create date at midnight (matches data point dates)
-    const daysAgo = (days: number) => {
-      const date = new Date(now);
-      date.setDate(date.getDate() - days);
-      date.setHours(0, 0, 0, 0);
-      return date;
-    };
-
-    const sampleMarkers: ChartMarker[] = [
-      // 5 days ago - multiple events to test fan animation
-      {
-        date: daysAgo(5),
-        icon: "🚀",
-        title: "v1.2.0 Released",
-        description: "New chart animations",
-        href: "https://github.com/example/releases/v1.2.0",
-        target: "_blank",
-      },
-      {
-        date: daysAgo(5),
-        icon: "🐛",
-        title: "Bug Fix",
-        description: "Fixed tooltip positioning",
-        onClick: () => console.log("Bug fix clicked!"),
-      },
-      {
-        date: daysAgo(5),
-        icon: "📦",
-        title: "Dependency Update",
-        description: "Updated motion to v12",
-      },
-      {
-        date: daysAgo(5),
-        icon: "🔒",
-        title: "Security Patch",
-        description: "CVE-2025-1234 fixed",
-        href: "https://github.com/example/security/advisories",
-        target: "_blank",
-      },
-      {
-        date: daysAgo(5),
-        icon: "⚡",
-        title: "Performance",
-        description: "50% faster renders",
-      },
-      // 12 days ago - single marker
-      {
-        date: daysAgo(12),
-        icon: "✨",
-        title: "Feature Launch",
-        description: "Added grid support",
-      },
-      // 20 days ago - pair of markers
-      {
-        date: daysAgo(20),
-        icon: "🎨",
-        title: "Design Update",
-        description: "New color system",
-      },
-      {
-        date: daysAgo(20),
-        icon: "📝",
-        title: "Docs Updated",
-        description: "Added examples",
-      },
-    ];
-    return sampleMarkers;
-  }, [propMarkers]);
+  // Use provided markers or empty array
+  const markers = propMarkers ?? [];
 
   return (
     <>

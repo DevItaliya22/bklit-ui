@@ -33,6 +33,8 @@ export const chartCssVars = {
   markerBackground: "var(--chart-marker-background)",
   markerBorder: "var(--chart-marker-border)",
   markerForeground: "var(--chart-marker-foreground)",
+  badgeBackground: "var(--chart-marker-badge-background)",
+  badgeForeground: "var(--chart-marker-badge-foreground)",
 };
 
 export interface Margin {
