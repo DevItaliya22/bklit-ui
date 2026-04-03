@@ -46,3 +46,6 @@ apps/web/app/playground/
 
 # Cursor rules (design system docs)
 .cursor/rules/animation-feeling-rules.mdc
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
